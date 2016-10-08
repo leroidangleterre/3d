@@ -1,1 +1,1 @@
-gcc 3d.c -o TroisD -lSDL -lm -lGL -lGLU -lSDL_image
+g++ 3d.cpp Vector.cpp Terrain.cpp -o Test
