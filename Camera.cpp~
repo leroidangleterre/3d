@@ -1,0 +1,20 @@
+#include "Camera.hpp"
+
+#include <iostream>
+
+using std::string;
+
+Camera::Camera(Empty e) : empty{e}{
+	
+}
+
+Camera::Camera(){
+	this.empty();
+}
+
+
+
+void Camera::afficherEtat(){
+	std::cout << "Camera {" << x << ", " << y << ", " << z << "}" << std::endl;
+}
+

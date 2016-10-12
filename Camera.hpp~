@@ -1,0 +1,18 @@
+#ifndef CAMERA
+#define CAMERA
+
+class Camera
+{
+	
+public:
+
+	Camera();
+	Camera(Empty e);
+	void afficherEtat();
+    
+private:
+	
+	Empty empty;
+};
+
+#endif
