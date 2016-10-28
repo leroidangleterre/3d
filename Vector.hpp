@@ -15,6 +15,7 @@ public:
 
 	Vector();
 	Vector(double xx, double yy, double zz);
+	Vector(const Vector*v);
 	void afficherEtat();
 	string to_string();
 	
@@ -34,10 +35,15 @@ public:
 	void to_zero();
 
 	double dot_prod(Vector v);
+	Vector vect_product(Vector other);
 
-	Vector scal_product(double fact);
+	Vector diff(Vector d);
+
+	void scal_product(double fact);
+	Vector get_scal_product(double fact);
 	double get_norm();
-	Vector normalize();
+	Vector get_normalized();
+	void normalize();
 	
 private:
 	

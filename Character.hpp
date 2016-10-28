@@ -42,6 +42,7 @@ public:
 	void convert_speed_local_to_global();
 	void convert_speed_global_to_local();
 	Empty*get_empty();
+	void raz_rotation();
 	
 private:
 

@@ -4,9 +4,12 @@
 #include <string>
 
 #include "Vector.hpp"
+#include "Arrow.hpp"
 
 
 using namespace std;
+
+
 
 
 class Empty
@@ -16,6 +19,7 @@ class Empty
 public:
 
 	Empty();
+	//Empty(const Empty&e);
 	void print();
 	string to_string();
 	Vector*get_origin();
@@ -28,6 +32,9 @@ public:
 	void rotate_local_y(double angle);
 	void translate(Vector v);
 	void push_forward(double distance);
+	void raz_rotation();
+	void render();
+
 	
 private:
 

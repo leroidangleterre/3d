@@ -24,25 +24,27 @@ public:
 	void load_mesh();
 	string to_string();
 	void evolve(int**pressed_keys_tab, Character*ch);
-	void apply_gravity(Character*ch, float period);
-	void collide(Character*cg, float period);
+	void apply_gravity(Character*ch, double period);
+	void collide(Character*cg, double period);
 	void render(Camera*my_cam, GLuint texture);
+	bool get_properly_loaded();
 	
 private:
 
-	void render(float xCam, float yCam, float zCam,
-		    float xCible, float yCible, float zCible,
-		    float xVertic, float yVertic, float zVertic,
+	void render(double xCam, double yCam, double zCam,
+		    double xCible, double yCible, double zCible,
+		    double xVertic, double yVertic, double zVertic,
 		    GLuint texture);
 	
 	string filename;
 	int nb_vertices;
-	float**tab_vertices;
-	float**tab_normals;
-	float**tab_texture;
+	double**tab_vertices;
+	double**tab_normals;
+	double**tab_texture;
 	int nb_faces;
 	int**tab_faces;
 	double z_min, z_max;
+	bool is_properly_loaded;
 };
 
 

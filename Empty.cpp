@@ -6,7 +6,7 @@ Empty::Empty() : origin(0, 0, 0), target(1, 0, 0), left(0, 1, 0), vertic(0, 0, 1
 	
 }
 
-
+// Empty::Empty(const Empty&e): 
 	
 
 string Empty::to_string(){
@@ -61,11 +61,14 @@ void Empty::rotate_z(double angle){
 void Empty::rotate_local_y(double angle){
 
 	double saved_angle = angle_z;
+	
+	if(angle != 0){
+		cout << "Empty::rotate_local_y(" << angle << ");" << endl;
+	}
 
 	/* Preparation: momentarily reset the angle_z. */
 	rotate_z(-saved_angle);
 
-	// origin.rotate_y(angle);
 	target.rotate_y(angle);
 	left.rotate_y(angle);
 	vertic.rotate_y(angle);
@@ -80,5 +83,23 @@ void Empty::translate(Vector v){
 
 
 void Empty::push_forward(double distance){
-	origin.increase(target.normalize().scal_product(distance));
+	origin.increase(target.get_normalized().get_scal_product(distance));
+}
+
+
+void Empty::raz_rotation(){
+	target = Vector(1, 0, 0);
+	left = Vector(0, 1, 0);
+	vertic = Vector(0, 0, 1);
+	angle_z = 0;
+}
+
+
+void Empty::render(){
+	Arrow targ_arrow(origin, target);
+	Arrow left_arrow(origin, left);
+	Arrow vertic_arrow(origin, vertic);
+	targ_arrow.render();
+	left_arrow.render();
+	vertic_arrow.render();
 }

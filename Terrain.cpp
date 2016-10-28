@@ -1,7 +1,5 @@
 #include "Terrain.hpp"
 
-
-
 Terrain::Terrain() : filename{"_"}{
 	
 }
@@ -31,6 +29,8 @@ void Terrain::load_mesh(){
 
 	if(!file){
 		cout << "Terrain::Terrain : error when opening file '" << filename << "'." << endl;
+		is_properly_loaded = false;
+		return;
 	}
 	else{
 		// Header
@@ -45,34 +45,43 @@ void Terrain::load_mesh(){
 			/* Find the amount of vertices and faces. */
 			if(line.substr(0, 14) == "element vertex"){
 				nb_vertices = stoi(line.substr(14, -1));
-				// cout << "Number of vertices: " << nb_vertices << endl;
+				cout << "Number of vertices: " << nb_vertices << endl;
 			}
 			if(line.substr(0, 12) == "element face"){
 				nb_faces = stoi(line.substr(12, -1));
-				// cout << "Number of faces: " << nb_faces << endl;
+				cout << "Number of faces: " << nb_faces << endl;
 			}
 		}
 
 		/* Memory allocation. */
-		tab_vertices = (float**)malloc(nb_vertices*sizeof(float*));
-		tab_texture = (float**)malloc(nb_vertices*sizeof(float*));
-		tab_normals = (float**)malloc(nb_vertices*sizeof(float*));
+		tab_vertices = (double**)malloc(nb_vertices*sizeof(double*));
+		tab_texture = (double**)malloc(nb_vertices*sizeof(double*));
+		tab_normals = (double**)malloc(nb_vertices*sizeof(double*));
 		for(i=0; i<nb_vertices; i++){
-			tab_vertices[i] = (float*)malloc(3*sizeof(float));
-			tab_texture[i] = (float*)malloc(3*sizeof(float));
-			tab_normals[i] = (float*)malloc(3*sizeof(float));
+			tab_vertices[i] = (double*)malloc(3*sizeof(double));
+			tab_texture[i] = (double*)malloc(2*sizeof(double));
+			tab_normals[i] = (double*)malloc(3*sizeof(double));
+			for(j=0; j<3; j++){
+				tab_vertices[i][j] = 0;
+				tab_normals[i][j] = 0;
+			}
+			tab_texture[i][0] = 0;
+			tab_texture[i][1] = 0;
 		}
 		tab_faces = (int**)malloc(nb_faces*sizeof(int*));
 		for(i=0; i<nb_faces; i++){
 			tab_faces[i] = (int*)malloc(3*sizeof(int));
+			for(j=0; j<3; j++){
+				tab_faces[i][j] = 0;
+			}
 		}
 
 
 		/* Vertices. */
 		
 		i=0;
-		while(i<nb_vertices-1){
-			getline(file, line);	
+		while(i<nb_vertices){
+			// the string line already contains info on the first vertex.
 
 			/* Vertices coordinates. */
 			for(j=0; j<3; j++){
@@ -94,23 +103,9 @@ void Terrain::load_mesh(){
 			tab_texture[i][0] = stof(word);
 			line = line.substr((pos+1), -1);
 			tab_texture[i][1] = stof(line);
-
-			/*
-			if(i > nb_vertices - 15){
-				cout << "Checking: ("
-				     << tab_vertices[i][0] << " ; "
-				     << tab_vertices[i][1] << " ; "
-				     << tab_vertices[i][2] << ") ; ("
-				     << tab_normals[i][0] << " ; "
-				     << tab_normals[i][1] << " ; "
-				     << tab_normals[i][2] << ") ; ("
-				     << tab_texture[i][0] << " ; "
-				     << tab_texture[i][1] << ")"
-				     << endl;
-			}
-			*/
 			
 			i++;
+			getline(file, line);
 		}
 
 		/* Set the values of z_min and z_max. */
@@ -128,10 +123,8 @@ void Terrain::load_mesh(){
 		/* Faces. */
 		
 		i=0;
-		while(getline(file, line) && i<nb_faces){
-
-			// cout << "line = '" << line << "'" << endl;
-
+		while(i<nb_faces){
+			
 			/* Number of points for the current face. */
 			pos = line.find(" ");
 			line = line.substr((pos+1), -1);
@@ -144,18 +137,12 @@ void Terrain::load_mesh(){
 				line = line.substr((pos+1), -1);
 			}
 			
-			/*
-			cout << "Checking: ("
-			     << tab_faces[i][0] << " ; "
-			     << tab_faces[i][1] << " ; "
-			     << tab_faces[i][2] << ") ;"
-			     << endl;
-			*/
-			
 			i++;
+			getline(file, line);
 		}
 		
 		cout << "Terrain file loaded." << endl;
+		is_properly_loaded = true;
 		// End of file.
 	}
 }
@@ -184,13 +171,13 @@ void Terrain::evolve(int**ptr_pressed_keys_tab, Character*ch){
    It may be uniform or computed with the current position of the character.
    That function modifies the speed of the character.
  */
-void Terrain::apply_gravity(Character*ch, float period){
+void Terrain::apply_gravity(Character*ch, double period){
 
 
 }
 
 
-void Terrain::collide(Character*cg, float period){
+void Terrain::collide(Character*cg, double period){
 
 }
 
@@ -216,18 +203,18 @@ void Terrain::render(Camera*my_cam, GLuint texture){
 
 
 
-void Terrain::render(float xCam, float yCam, float zCam,
-		     float xCible, float yCible, float zCible,
-		     float xVertic, float yVertic, float zVertic,
+void Terrain::render(double xCam, double yCam, double zCam,
+		     double xCible, double yCible, double zCible,
+		     double xVertic, double yVertic, double zVertic,
 		     GLuint texture){
 
 	int index;
 	int i, j;
-	float z;
-	float z_int = 0.5*(z_min+z_max);
+	
 	/* Color: RGB and UV-mapping. */
 	int r, g, b;
-	float uv_u, uv_v;
+	double uv_u, uv_v;
+	double x, y, z;
 
 
 	gluLookAt(xCam ,yCam, zCam,
@@ -244,14 +231,21 @@ void Terrain::render(float xCam, float yCam, float zCam,
 				cout << "Error render" << endl;
 			}
 
+			
 			uv_u = tab_texture[index][0];
 			uv_v = tab_texture[index][1];
-
 			glTexCoord2d(uv_u, uv_v);
-			glVertex3d(tab_vertices[index][0],
-				   tab_vertices[index][1],
-				   tab_vertices[index][2]);
+			
+			x = tab_vertices[index][0];
+			y = tab_vertices[index][1];
+			z = tab_vertices[index][2];
+			
+			glVertex3d(x, y, z);
 		}
 	}
 	glEnd();
+}
+
+bool Terrain::get_properly_loaded(){
+	return is_properly_loaded;
 }

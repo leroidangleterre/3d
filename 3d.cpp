@@ -56,6 +56,11 @@ int main(){
        	int elapsed_periods = 0;
 
 
+	if(!(my_terrain.get_properly_loaded())){
+		cout << "ERROR Terrain::Terrain(); exit." << endl;
+		return -1;
+	}
+	
 	
 	/* Init SDL. */
 
@@ -97,6 +102,7 @@ int main(){
 	glEnable(GL_TEXTURE_2D);
 
 	texture_terrain = loadTexture("uv_map_torus.jpeg", 0); //TODO: 2nd parameter is 1.
+	// texture_terrain = loadTexture("uv_map_horizontal.png", 0); //TODO: 2nd parameter is 1.
 	glBindTexture(GL_TEXTURE_2D, texture_terrain);
 
 	glMatrixMode(GL_PROJECTION);
@@ -167,9 +173,9 @@ int main(){
 				(pressed_keys_tab)[LOOP]=0;
 			}
 			
-			if(pressed_keys_tab[SDLK_LCTRL] == 1){
-				printf("\t ctrl\n");
-			}
+			// if(pressed_keys_tab[SDLK_LCTRL] == 1){
+			//	printf("\t ctrl\n");
+			// }
 			if(pressed_keys_tab[SDLK_ESCAPE] == 1){
 				printf("\t esc\n");
 			}
@@ -180,14 +186,15 @@ int main(){
 				pressed_keys_tab[LOOP] = 0;
 			}
 
-		
+
+			/* Move the character with the keyboard and mouse. */
 			my_character.update_speed(&(pressed_keys_tab), period);
 			my_character.update_position(&(pressed_keys_tab), period);
-		
-			/* On modifie la distance standard entre la cam et le perso. */
-			my_cam.push_forward_with_wheel(&(pressed_keys_tab[WHEEL_LEVEL]));
-			// avancer_camera_vers_perso_selon_molette(
-		
+
+			/* Move the camera with the keyboard and mouse. */
+			my_cam.update_position(&(pressed_keys_tab), period);
+			
+			
 		
 			//evoluer_terrain(&my_terrain, &pressed_keys_tab, &my_character);
 			my_terrain.evolve(&pressed_keys_tab, &my_character);
@@ -275,11 +282,11 @@ void read_input(int**pressed_keys_tab){
 				break;
 			case SDL_BUTTON_WHEELUP:
 				(*pressed_keys_tab)[WHEEL_LEVEL]++;
-				printf("niveau molette: %d\n", (*pressed_keys_tab)[WHEEL_LEVEL]);
+				printf("Wheel level: %d\n", (*pressed_keys_tab)[WHEEL_LEVEL]);
 				break;
 			case SDL_BUTTON_WHEELDOWN:
 				(*pressed_keys_tab)[WHEEL_LEVEL]--;
-				printf("niveau molette: %d\n", (*pressed_keys_tab)[WHEEL_LEVEL]);
+				printf("Wheel level: %d\n", (*pressed_keys_tab)[WHEEL_LEVEL]);
 				break;
 			}
 		case SDL_KEYDOWN:

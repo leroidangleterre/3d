@@ -21,7 +21,11 @@ void Character::set_camera(Camera*cam_param){
 	my_cam = cam_param;
 	my_cam->set_character(this);
 	/* Place the camera at the appropriate location. */
-	my_cam->set_position(empty);
+	//my_cam->set_position(empty);
+
+	/* Place the camera at the same location and orientation as the character. */
+	my_cam->set_empty(empty);
+	
 	my_cam->push_forward(-3);
 }
 
@@ -67,7 +71,6 @@ void Character::update_position(int**tab, double period){
 	Vector movement;
 	
 	if(!(*tab)[SDLK_LCTRL] && !(*tab)[SDLK_RCTRL]){
-		// cout << "\tROTATE" << endl;
 		rotate_z(-rotate_angle*((double)((*tab)[DX_MOUSE]))/100);
 		
 		/* Rotate the camera around the center of the character:
@@ -76,16 +79,49 @@ void Character::update_position(int**tab, double period){
 		   3) Move the camera backwards along its new axis. */
 
 		my_cam->set_position(empty);
-		my_cam->rotate_local_y(rotate_angle * ((double)((*tab)[DY_MOUSE]))/100);
+		my_cam->rotate_local_y(-rotate_angle * ((double)((*tab)[DY_MOUSE]))/100);
 		my_cam->rotate_z(-rotate_angle * ((double)((*tab)[DX_MOUSE]))/100);
-		my_cam->push_forward(-3);
+		my_cam->pull_from_character();
 	}
 	(*tab)[DX_MOUSE]=0; /* RAZ. */
 	(*tab)[DY_MOUSE]=0; /* RAZ. */
 
 
+	/* Rotations for debug. */
+	// Keypad 1: Front
+	if((*tab)[SDLK_KP1]){
+		(*tab)[SDLK_KP1] = 0;
+		raz_rotation();
+	}
+	// Keypad 3: Side
+	if((*tab)[SDLK_KP3]){
+		(*tab)[SDLK_KP3] = 0;
+		raz_rotation();
+		empty.rotate_z(PI/2);
+		my_cam -> rotate_z(PI/2);
+	}
+	// Keypad 7: Top
+	if((*tab)[SDLK_KP7]){
+		(*tab)[SDLK_KP7] = 0;
+		raz_rotation();
+		empty.rotate_local_y(PI/2);
+		cout << "my_cam->rotate_local_y(" << PI/2 << ");" << endl;
+		my_cam -> rotate_local_y(PI/2);
+	}
+
+	// Change distance from cam to character
+	if((*tab)[SDLK_KP_PLUS]){
+		(*tab)[SDLK_KP_PLUS] = 0;
+		my_cam -> multiply_distance_from_target(1/1.1);
+	}
+	if((*tab)[SDLK_KP_MINUS]){
+		(*tab)[SDLK_KP_MINUS] = 0;
+		my_cam -> multiply_distance_from_target(1.1);
+	}
+
+
 	convert_speed_local_to_global();
-	movement = global_speed.scal_product(period);
+	movement = global_speed.get_scal_product(period);
 	empty.translate(movement);
 	my_cam->translate(movement);
 }
@@ -97,20 +133,23 @@ void Character::render(){
 	double y = empty.get_origin()->get_y();
 	double z = empty.get_origin()->get_z();
 
-	int i;
+	double i;
 
 	glBegin(GL_QUADS);
-	for(i=-5; i<5; i++){
-		glColor3ub(255, 0, 0);
+	for(i=0; i<=5; i++){
+		/* Base: Red,
+		   Top: Green. */
+		glColor3ub(255*(5-i)/5,
+			   255*(i/5),
+			   0);
 		glVertex3d(x+1, y+1, z+i/5);
-		glColor3ub(0, 255, 0);
 		glVertex3d(x+1, y-1, z+i/5);
-		glColor3ub(0, 0, 255);
 		glVertex3d(x-1, y-1, z+i/5);
-		glColor3ub(255, 255, 255);
 		glVertex3d(x-1, y+1, z+i/5);
 	}
 	glEnd();
+
+	empty.render();
 }
 
 
@@ -176,4 +215,11 @@ void Character::convert_speed_global_to_local(){
 Empty* Character::get_empty(){
 
 	return &empty;
+}
+
+
+void Character::raz_rotation(){
+
+	empty.raz_rotation();
+	my_cam->raz_rotation();
 }

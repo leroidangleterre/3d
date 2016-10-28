@@ -9,8 +9,15 @@ Vector::Vector() : x{0.0}, y{0.0}, z{0.0}
 
 Vector::Vector(double xx, double yy, double zz):
 	x{xx}, y{yy}, z{zz}
-	 {
-	 }
+{
+
+}
+
+Vector::Vector(const Vector*v):
+	x{v->x}, y{v->y}, z{v->z}
+{
+
+}
 
 void Vector::afficherEtat(){
 	cout << "Vector {" << x << ", " << y << ", " << z << "}" << endl;
@@ -55,8 +62,8 @@ void Vector::rotate_z(double angle){
 
 void Vector::rotate_y(double angle){
 
-	double new_x = x*cos(angle) - z*sin(angle);
-	double new_z = x*sin(angle) + z*cos(angle);
+	double new_x = x*cos(angle) + z*sin(angle);
+	double new_z = -x*sin(angle) + z*cos(angle);
 	
 	x = new_x;
 	z = new_z;
@@ -89,16 +96,22 @@ double Vector::dot_prod(Vector v){
 }
 
 
-Vector Vector::scal_product(double fact){
+Vector Vector::get_scal_product(double fact){
 	Vector prod(fact*x, fact*y, fact*z);
 	return prod;
+}
+
+void Vector::scal_product(double fact){
+	set_x(fact*x);
+	set_x(fact*y);
+	set_x(fact*z);
 }
 
 double Vector::get_norm(){
 	return sqrt(x*x + y*y + z*z);
 }
 
-Vector Vector::normalize(){
+Vector Vector::get_normalized(){
 	double norm = get_norm();
 
 	Vector res;
@@ -118,5 +131,41 @@ Vector Vector::normalize(){
 	res.set_y(y);
 	res.set_z(z);
 
+	return res;
+}
+
+void Vector::normalize(){
+	double norm = get_norm();
+
+	if(norm == 0){
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+	else{
+		x = x / norm;
+		y = y / norm;
+		z = z / norm;
+	}
+}
+
+
+/* Compute this minus d; */
+Vector Vector::diff(Vector d){
+	Vector res(x - d.x,
+		   y - d.y,
+		   z - d.z);
+	return res;
+}
+
+
+/* Compute this^other; */
+Vector Vector::vect_product(Vector other){
+
+	double x_res, y_res, z_res;
+
+	
+	
+	Vector res(x_res, y_res, z_res);
 	return res;
 }
