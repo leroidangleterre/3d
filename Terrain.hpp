@@ -28,6 +28,7 @@ public:
 	void collide(Character*cg, double period);
 	void render(Camera*my_cam, GLuint texture);
 	bool get_properly_loaded();
+	Vector get_gravity(Vector pos);
 	
 private:
 

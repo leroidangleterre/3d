@@ -82,11 +82,11 @@ int main(){
 		SDL_ShowCursor(0);
 		
 		SDL_SetVideoMode(screen_width, screen_height, 32, SDL_OPENGL | SDL_RESIZABLE | SDL_FULLSCREEN);
-		
+		// SDL_SetRelativeMouseMode( SDL_TRUE );
 	}
 	else{
 		/* Non fullscreen. */
-		SDL_SetVideoMode(screen_width/2, screen_height/2, 32, SDL_OPENGL | SDL_RESIZABLE);
+		SDL_SetVideoMode(0.9*screen_width, 0.9*screen_height, 32, SDL_OPENGL | SDL_RESIZABLE);
 	}
 	
 
@@ -246,9 +246,7 @@ int main(){
 void read_input(int**pressed_keys_tab){
 	
 	SDL_Event e;
-	/*
-	  printf("lire\n");
-	*/
+
 	while(SDL_PollEvent(&e)!=0){
 		
 		switch(e.type){
@@ -260,12 +258,11 @@ void read_input(int**pressed_keys_tab){
 		case SDL_MOUSEMOTION:
 			/* Les cases pressed_keys_tab[DX_MOUSE] et pressed_keys_tab[DY_MOUSE] mémorisent le déplacement total de la souris
 			   depuis la dernière lecture par l'autre thread. */
-			(*pressed_keys_tab)[DX_MOUSE]=(*pressed_keys_tab)[DX_MOUSE]+e.motion.xrel;
-			(*pressed_keys_tab)[DY_MOUSE]=(*pressed_keys_tab)[DY_MOUSE]+e.motion.yrel;
-		
-			/* Bidouille... qui fonctionne... */
-			e.motion.xrel=0;
-			e.motion.yrel=0;
+			(*pressed_keys_tab)[DX_MOUSE] = (*pressed_keys_tab)[DX_MOUSE] + e.motion.xrel;
+			(*pressed_keys_tab)[DY_MOUSE] = (*pressed_keys_tab)[DY_MOUSE] + e.motion.yrel;
+
+			// cout << "Mouse movement detected xrel = " << e.motion.xrel << ", yrel = " << e.motion.yrel << ";" << endl;
+			// cout << "                        x    = " << e.motion.x    << ", y    = " << e.motion.y    << ";" << endl;
 			break;
 			
 		case SDL_MOUSEBUTTONDOWN:

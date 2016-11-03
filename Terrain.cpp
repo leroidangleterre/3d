@@ -249,3 +249,16 @@ void Terrain::render(double xCam, double yCam, double zCam,
 bool Terrain::get_properly_loaded(){
 	return is_properly_loaded;
 }
+
+
+
+/* The local gravity depends on the gravity field of the terrain
+   and the position. */
+Vector Terrain::get_gravity(Vector pos){
+
+	Vector gravity;
+
+	// Compute the gravity here.
+	
+	return gravity;
+}
